@@ -1,0 +1,35 @@
+{
+  "name": "node-express-productos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "connect-mongo": "^4.6.0",
+    "core-js": "^3.16.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "hbs": "^4.1.2",
+    "knex": "^0.95.10",
+    "mongoose": "^6.0.5",
+    "mysql": "^2.18.1",
+    "normalizr": "^3.6.1",
+    "passport": "^0.5.0",
+    "passport-local": "^1.0.0",
+    "regenerator-runtime": "^0.13.9",
+    "sqlite3": "^5.0.2",
+    "websocket": "^1.0.34"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.8",
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0"
+  }
+}

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/normalizr@3.6.1/dist/normalizr.browser.js" integrity="sha256-U8PCuMAyTFGQ2osGN2TQaEeBAow/cuSpzaQWQ/rnqCo=" crossorigin="anonymous"></script></head>
+
+<body>
+                    {{#if hayNombre }}
+<div class="container alert alert-success d-flex justify-content-between">
+    <h1>Bienvenido {{nombre}}</h1>
+    <a href="/logout" class="btn btn-warning">Desloguear</a>
+</div>
+{{/if}}
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Ingrese producto</h1>
+                <div class="mb-3">
+                    <!-- Margin Bottom 3-->
+                    <label for="txtNombre" class="form-label">Nombre:</label>
+                    <input id="txtNombre" type="text" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="txtPrecio" class="form-label">Precio:</label>
+                    <input id="txtPrecio" type="text" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="txtImagen" class="form-label">Imagen:</label>
+                    <input id="txtImagen" type="text" class="form-control">
+                </div>
+                <button id="btnSend" class="btn btn-primary">Enviar</button>
+            </div>
+            <div class="mt-4">
+                <a href="/">Inicio</a>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div id="result" class="col-md-12">
+                {{#if hayProductos }}
+                <table class="mt-4 table table-striped table-dark">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Foto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each productos}}
+                        <tr>
+                            <td>{{title}}</td>
+                            <td>{{price}}</td>
+                            <td><img alt="icon" src="{{thumbnail}}" style="max-height: 40px;"></td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <div class="alert alert-warning mt-3">
+                    No se encontraron productos
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="mb-3" id="messages-title">Centro de mensajes</h2>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" placeholder="Email" id="txtEmail" class="form-control mb-3">
+                    </div>
+                    <div class="col"></div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" placeholder="Nombre" id="txtNombre" class="form-control mb-3" value="Rodrigo">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" placeholder="Apellido" id="txtApellido" class="form-control mb-3" value="Saez">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" placeholder="Edad" id="txtEdad" class="form-control mb-3" value="28">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" placeholder="Alias" id="txtAlias" class="form-control mb-3" value="Rodrigo">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="text" placeholder="Avatar" id="txtAvatar" class="form-control mb-3" value="image.jpg">
+                    </div>
+                </div>
+                <div id="chat">
+                </div>
+                <div class="row">
+                    <div class="col-9">
+                        <input type="text" id="txtMensaje" class="form-control" placeholder="Ingresá un mensaje ">
+                    </div>
+                    <div class="col-3">
+                        <button id="btnSendChat" class="btn btn-primary">Enviar!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Cargo el script de handlebars para usarlo en el navegador -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script>
+        const authorSchema = new normalizr.schema.Entity('authors', {}, {
+            idAttribute: 'email'
+        });
+
+        const messageSchema = new normalizr.schema.Entity('messages', {
+            author: authorSchema
+        }, {
+            idAttribute: '_id'
+        })
+
+        const messageListSchema = [messageSchema]
+        const txtTitle = document.getElementById("txtNombre");
+        const txtPrice = document.getElementById("txtPrecio");
+        const txtThumbnail = document.getElementById("txtImagen");
+        const btnSend = document.getElementById("btnSend");
+
+        btnSend.addEventListener("click", async function ($event) {
+            const producto = {
+                title: txtTitle.value,
+                price: txtPrice.value,
+                thumbnail: txtThumbnail.value
+            };
+
+            await fetch("/api/productos/guardar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(producto)
+            });
+        })
+
+        // Codigo para el websocket
+        // Primero cargo el template de handlebars, necesito usar {{{raw}}} para que no se compile en el server 
+        // solamente necesito usarlo en el navegador
+        const template = `
+                {{{{raw-helper}}}}
+
+                {{#if hayProductos }}
+                <table class="mt-4 table table-striped table-dark">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Foto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each productos}}
+                        <tr>
+                            <td>{{title}}</td>
+                            <td>{{price}}</td>
+                            <td><img alt="icon" src="{{thumbnail}}" style="max-height: 40px;"></td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <div class="alert alert-warning mt-3">
+                    No se encontraron productos
+                </div>
+                {{/if}}
+
+                {{{{/raw-helper}}}}
+        `;
+        // Dejo mi template de handlebars listo para usar
+        const templateCompiled = Handlebars.compile(template);
+
+        // Me conecto al websocket server
+        const ws = new WebSocket("ws://localhost:9898/");
+        // Cuando se conecte envío un mensaje de prueba
+        ws.onopen = () => {
+            console.log("WebSocket client Connected");
+        }
+
+        const divChat = document.getElementById("chat");
+        const messagesTitle = document.getElementById("messages-title");
+        // Cuando reciba información la voy a parsear como JSON
+        // Después remplazo el html del div#result por el del template con los datos nuevos
+        ws.onmessage = e => {
+            const data = JSON.parse(e.data);
+            if (data.type === "products") {
+                document.getElementById("result").innerHTML = templateCompiled(data);
+            } else if (data.type === "chat") {
+                const mensajeFormateado = formatearMensaje(data);
+                const elementoHtmlMensaje = document.createElement("p");
+                elementoHtmlMensaje.innerHTML = mensajeFormateado;
+                divChat.appendChild(elementoHtmlMensaje);
+            } else if(data.type === "chatsArray") {
+                messagesTitle.appendChild(document.createTextNode(` - Compresion: ${data.compresion}%`))
+                const mensajes = normalizr.denormalize(data.mensajes.result, messageListSchema, data.mensajes.entities)
+                const formateados = mensajes.map(formatearMensaje);
+                formateados.forEach(mensajeFormateado => { 
+                    const elementoHtmlMensaje = document.createElement("p");
+                    elementoHtmlMensaje.innerHTML = mensajeFormateado;
+                    divChat.appendChild(elementoHtmlMensaje);
+                })
+            }
+            console.log(`Received: '${e.data}'`);
+        }
+
+        const txtEmail = document.getElementById("txtEmail");
+        const txtMensaje = document.getElementById("txtMensaje");
+        const txtNombre = document.getElementById("txtNombre")
+        const txtApellido = document.getElementById("txtApellido")
+        const txtEdad = document.getElementById("txtEdad")
+        const txtAlias = document.getElementById("txtAlias")
+        const txtAvatar = document.getElementById("txtAvatar")
+        const btnEnviarChat = document.getElementById("btnSendChat");
+
+        btnEnviarChat.addEventListener("click", e => {
+            const email = txtEmail.value;
+
+            if (email === "" || email == null) {
+                alert("Debe ingresar un email.");
+                return;
+            }
+            const mensaje = txtMensaje.value;
+            const nombre = txtNombre.value
+            const apellido = txtApellido.value
+            const edad = txtEdad.value
+            const alias = txtAlias.value
+            const avatar = txtAvatar.value
+
+            const objetoMensaje = {
+                type: "chat",
+                author: {
+                    email: email,
+                    nombre: nombre,
+                    apellido: apellido,
+                    edad: edad, 
+                    alias: alias,
+                    avatar: avatar
+                },
+                text: mensaje
+            };
+
+            ws.send(JSON.stringify(objetoMensaje));
+        });
+
+        function formatearMensaje(objetoMensaje) {
+            return `<span class="fw-bold text-primary">${objetoMensaje.author.email}</span>
+                        <span class="text-warning">[${objetoMensaje.date}]:</span>
+                        <span class="text-success fst-italics">[${objetoMensaje.text}]</span>
+                    `
+        }
+    </script>
+</body>
+
+</html>
